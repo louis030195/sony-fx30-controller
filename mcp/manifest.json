@@ -1,0 +1,49 @@
+{
+  "manifest_version": "0.3",
+  "name": "sony-fx30",
+  "display_name": "Sony FX30 Camera Controller",
+  "version": "0.1.0",
+  "description": "Control your Sony FX30 camera with AI",
+  "long_description": "Direct PTP/IP control of the Sony FX30 cinema camera over Wi-Fi. Set ISO, aperture, shutter speed, white balance, focus mode, exposure compensation, start/stop recording, and see the live viewfinder — all from Claude. Say 'set up for a cinematic interview' and Claude configures everything.",
+  "author": {
+    "name": "screenpipe",
+    "url": "https://screenpi.pe"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mediar-ai/screenpipe"
+  },
+  "homepage": "https://screenpi.pe",
+  "license": "MIT",
+  "server": {
+    "type": "node",
+    "entry_point": "dist/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/dist/index.js"]
+    }
+  },
+  "tools": [
+    { "name": "connect-camera", "description": "Connect to the Sony FX30 camera over Wi-Fi via PTP/IP" },
+    { "name": "disconnect-camera", "description": "Disconnect from the camera" },
+    { "name": "get-camera-settings", "description": "Get all current camera settings" },
+    { "name": "get-live-frame", "description": "Capture the current viewfinder image as JPEG" },
+    { "name": "set-iso", "description": "Set camera ISO" },
+    { "name": "set-shutter-speed", "description": "Set shutter speed" },
+    { "name": "set-aperture", "description": "Set aperture (f-number)" },
+    { "name": "set-white-balance", "description": "Set white balance preset" },
+    { "name": "set-exposure-comp", "description": "Set exposure compensation in EV" },
+    { "name": "set-focus-mode", "description": "Set autofocus mode" },
+    { "name": "start-recording", "description": "Start video recording" },
+    { "name": "stop-recording", "description": "Stop video recording" },
+    { "name": "start-zoom", "description": "Start zooming (power zoom lenses)" },
+    { "name": "stop-zoom", "description": "Stop zooming" }
+  ],
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "node": ">=18.0.0"
+    }
+  },
+  "keywords": ["camera", "sony", "fx30", "ptp", "cinema", "video", "photography"]
+}
