@@ -50,14 +50,63 @@ communicates directly with the camera via **PTP/IP** (Picture Transfer Protocol 
 | zoom | `0xD2DD` | zoom direction and speed |
 | storage | `0xD222` | remaining storage |
 
-## setup
+## MCP server (AI camera control)
+
+control your camera with natural language through Claude. say "set up for a cinematic interview" and Claude configures ISO, shutter, aperture, WB — and can see the live viewfinder to check exposure.
+
+### install
+
+download [`sony-fx30.mcpb`](https://github.com/louis030195/sony-fx30-controller/releases) and open it. Claude Desktop will prompt you to install.
+
+or build from source:
+
+```bash
+cd mcp
+npm install
+npm run build
+npx @anthropic-ai/mcpb pack
+open sony-fx30.mcpb
+```
+
+### tools
+
+| tool | description |
+|------|-------------|
+| `connect-camera` | connect to camera via IP (default 192.168.122.1) |
+| `get-camera-settings` | get all current settings |
+| `get-live-frame` | capture viewfinder image as JPEG (Claude can see it) |
+| `set-iso` | set ISO (Auto, 100–12800) |
+| `set-shutter-speed` | set shutter speed (1/24–1/1000) |
+| `set-aperture` | set f-number (f/1.4–f/22) |
+| `set-white-balance` | set WB (Auto, Daylight, Tungsten, etc.) |
+| `set-exposure-comp` | set EV compensation (-3.0 to +3.0) |
+| `set-focus-mode` | set AF mode (AF-S, AF-C, MF, DMF) |
+| `start-recording` | start video recording |
+| `stop-recording` | stop video recording |
+| `start-zoom` / `stop-zoom` | zoom in/out (power zoom lenses) |
+
+### how it works
+
+```
+Sony FX30 (Wi-Fi, port 15740)
+    ↑ PTP/IP (raw TCP via Node.js net.Socket)
+sony-fx30-mcp (TypeScript MCP server)
+    ↑ JSON-RPC over stdio
+Claude Desktop / Claude Code
+```
+
+no Swift app needed. the MCP server speaks PTP/IP directly to the camera over TCP.
+
+## native app
+
+### setup
 
 1. enable Wi-Fi on your FX30
 2. connect your Mac/iPhone to the camera's Wi-Fi network
 3. enable "Remote Shoot Function" on the camera (Menu → Network → Remote Shoot)
 4. camera IP is typically `192.168.122.1`
 
-## build
+### build
 
 ```bash
 # macOS
@@ -69,7 +118,7 @@ open Package.swift
 # select your iPhone as the run destination
 ```
 
-## requirements
+### requirements
 
 - macOS 14+ or iOS 17+
 - Xcode 15+ (for iOS builds)
@@ -87,6 +136,16 @@ built for the Sony FX30 but should work with other Sony cameras that support PTP
 ## architecture
 
 ```
+mcp/                              ← MCP server (TypeScript)
+├── src/
+│   ├── index.ts                  — MCP server entry point (stdio transport)
+│   ├── ptp-protocol.ts           — protocol constants, packet builders
+│   ├── ptp-client.ts             — TCP client, handshake, send/receive
+│   └── camera.ts                 — high-level camera API
+├── manifest.json                 — MCP metadata for .mcpb
+├── package.json
+└── tsconfig.json
+
 Sources/SonyFX30Controller/
 ├── Camera/
 │   ├── PTPProtocol.swift      — PTP/IP constants, packet types, Sony property codes
